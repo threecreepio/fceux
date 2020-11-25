@@ -890,9 +890,11 @@ int main(int argc,char *argv[])
 	}
 	if(GameInfo && LuaToLoad)
 	{
-		FCEU_LoadLuaCode(LuaToLoad);
+		FCEU_LoadLuaCode(LuaToLoad, LuaArgument);
 		free(LuaToLoad);
+		free(LuaArgument);
 		LuaToLoad = NULL;
+		LuaArgument = NULL;
 	}
 
 	//Initiates AVI capture mode, will set up proper settings, and close FCUEX once capturing is finished
