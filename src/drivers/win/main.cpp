@@ -683,7 +683,7 @@ int main(int argc,char *argv[])
 #endif
 	}
 
-	SetThreadAffinityMask(GetCurrentThread(),1);
+	//SetThreadAffinityMask(GetCurrentThread(),1);
 
 	//printf("%08x",opsize); //AGAIN?!
 
