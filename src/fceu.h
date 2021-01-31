@@ -9,6 +9,7 @@ void ResetGameLoaded(void);
 
 //overclocking-related
 extern bool overclock_enabled;
+extern bool aggressiveskip_disabled;
 extern bool overclocking;
 extern bool skip_7bit_overclocking;
 extern int normalscanlines;
@@ -146,9 +147,7 @@ void FCEU_TogglePPU();
 void SetNESDeemph_OldHacky(uint8 d, int force);
 void DrawTextTrans(uint8 *dest, uint32 width, uint8 *textmsg, uint8 fgcolor);
 void FCEU_PutImage(void);
-#ifdef FRAMESKIP
 void FCEU_PutImageDummy(void);
-#endif
 
 #ifdef WIN32
 extern void UpdateCheckedMenuItems();

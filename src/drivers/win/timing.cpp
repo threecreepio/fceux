@@ -32,6 +32,7 @@ void CloseTimingDialog(HWND hwndDlg)
 		eoptions &= ~EO_NOTHROTTLE;
 	}
 
+	aggressiveskip_disabled = (IsDlgButtonChecked(hwndDlg, CB_AGGRESSIVESKIP) == BST_CHECKED);
 	overclock_enabled = (IsDlgButtonChecked(hwndDlg, CB_OVERCLOCKING) == BST_CHECKED);
 	skip_7bit_overclocking = (IsDlgButtonChecked(hwndDlg, CB_SKIP_7BIT) == BST_CHECKED);
 
@@ -91,6 +92,11 @@ INT_PTR CALLBACK TimingConCallB(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM l
 			if(newppu)
 			{
 				EnableWindow(GetDlgItem(hwndDlg, CB_OVERCLOCKING), false);
+			}
+
+			if (aggressiveskip_disabled)
+			{
+				CheckDlgButton(hwndDlg, CB_AGGRESSIVESKIP, BST_CHECKED);
 			}
 
 			if(overclock_enabled)

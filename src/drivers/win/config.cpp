@@ -504,6 +504,7 @@ static CFGSTRUCT fceuconfig[] =
 	AC(SingleInstanceOnly),
 	AC(Show_FPS),
 	AC(movieRecordMode),
+	AC(aggressiveskip_disabled),
 
 	ENDCFGSTRUCT
 };

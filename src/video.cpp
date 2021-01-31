@@ -144,7 +144,6 @@ int FCEU_InitVirtualVideo(void)
 	return 1;
 }
 
-#ifdef FRAMESKIP
 void FCEU_PutImageDummy(void)
 {
 	ShowFPS();
@@ -156,7 +155,6 @@ void FCEU_PutImageDummy(void)
 	}
 	if(guiMessage.howlong) guiMessage.howlong--; /* DrawMessage() */
 }
-#endif
 
 static int dosnapsave=0;
 void FCEUI_SaveSnapshot(void)

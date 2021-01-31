@@ -1750,10 +1750,11 @@ void FCEUPPU_Power(void) {
 	BWrite[0x4014] = B4014;
 }
 
-int FCEUPPU_Loop(int skip) {
+void FCEUPPU_Loop(int skip) {
 	if ((newppu) && (GameInfo->type != GIT_NSF)) {
 		int FCEUX_PPU_Loop(int skip);
-		return FCEUX_PPU_Loop(skip);
+		FCEUX_PPU_Loop(skip);
+		return;
 	}
 
 	//Needed for Knight Rider, possibly others.
@@ -1817,8 +1818,7 @@ int FCEUPPU_Loop(int skip) {
 		}
 		if (GameInfo->type == GIT_NSF)
 			X6502_Run((256 + 85) * normalscanlines);
-		#ifdef FRAMESKIP
-		else if (skip) {
+		else if (skip && !aggressiveskip_disabled && (!taseditorActive || (taseditorSkipping && currFrameCounter % 0x20 != 0))) {
 			int y;
 
 			y = SPRAM[0];
@@ -1840,7 +1840,6 @@ int FCEUPPU_Loop(int skip) {
 			} else
 				X6502_Run((256 + 85) * 240);
 		}
-		#endif
 		else {
 			deemp = PPU[1] >> 5;
 
@@ -1882,19 +1881,9 @@ int FCEUPPU_Loop(int skip) {
 			SetNESDeemph_OldHacky(maxref, 0);
 		}
 	}	//else... to if(ppudead)
-
-	#ifdef FRAMESKIP
-	if (skip) {
-		FCEU_PutImageDummy();
-		return(0);
-	} else
-	#endif
-	{
-		return(1);
-	}
 }
 
-int (*PPU_MASTER)(int skip) = FCEUPPU_Loop;
+void (*PPU_MASTER)(int skip) = FCEUPPU_Loop;
 
 static uint16 TempAddrT, RefreshAddrT;
 
