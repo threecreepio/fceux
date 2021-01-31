@@ -485,9 +485,10 @@ extern int test; test++;
    }
 
 	//will probably cause a major speed decrease on low-end systems
-   DEBUG( DebugCycle() );
-
-   IncrementInstructionsCounters();
+   if (debuggingActive == 1) {
+       DEBUG(DebugCycle());
+       IncrementInstructionsCounters();
+   }
 
    _PI=_P;
    b1=RdMem(_PC);

@@ -1777,6 +1777,7 @@ INT_PTR CALLBACK DebuggerCallB(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lP
 	{
 		case WM_INITDIALOG:
 		{
+			ActivateDebugging();
 			CheckDlgButton(hwndDlg, IDC_DEBUGGER_BREAK_ON_CYCLES, break_on_cycles ? BST_CHECKED : BST_UNCHECKED);
 			CheckDlgButton(hwndDlg, IDC_DEBUGGER_BREAK_ON_INSTRUCTIONS, break_on_instructions ? BST_CHECKED : BST_UNCHECKED);
 			sprintf(str, "%u", (unsigned)break_cycles_limit);

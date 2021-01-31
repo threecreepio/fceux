@@ -96,6 +96,7 @@ extern uint32 iapoffset; //mbg merge 7/18/06 changed from int
 void DebugCycle();
 bool CondForbidTest(int bp_num);
 void BreakHit(int bp_num);
+void ActivateDebugging();
 
 extern bool break_asap;
 extern uint64 total_cycles_base;
@@ -106,6 +107,7 @@ extern uint64 total_instructions;
 extern uint64 delta_instructions;
 extern bool break_on_instructions;
 extern uint64 break_instructions_limit;
+extern int debuggingActive;
 extern void ResetDebugStatisticsCounters();
 extern void ResetCyclesCounter();
 extern void ResetInstructionsCounter();

@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <cstring>
 
+int debuggingActive = 0;
 unsigned int debuggerPageSize = 14;
 int vblankScanLines = 0;	//Used to calculate scanlines 240-261 (vblank)
 int vblankPixel = 0;		//Used to calculate the pixels in vblank
@@ -806,6 +807,9 @@ STOPCHECKING:
 
 void DebugCycle()
 {
+	if (debuggingActive == 0)
+		return;
+
 	uint8 opcode[3] = {0};
 	uint16 A = 0, tmp;
 	int size;
@@ -866,4 +870,10 @@ void DebugCycle()
 		LogCDData(opcode, A, size);
 
 	FCEUD_TraceInstruction(opcode, size);
+}
+
+
+void ActivateDebugging()
+{
+	debuggingActive = 1;
 }

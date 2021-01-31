@@ -380,6 +380,7 @@ INT_PTR CALLBACK TracerCallB(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lPar
 	{
 		case WM_INITDIALOG:
 		{
+			ActivateDebugging();
 			hTracer = hwndDlg;
 			// calculate initial size/positions of items
 			RECT mainRect;
