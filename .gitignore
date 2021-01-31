@@ -3,6 +3,8 @@
 /vc/vc14_bin_Debug
 /vc/vc14_obj_Debug
 /vc/vc14_obj_Release
+/vc/vc14_obj_GenPGO
+/vc/vc14_obj_ReleasePGO
 /vc/vc14_obj_PublicRelease
 /vc/vc10_bin_Debug
 /vc/vc10_obj_Debug
