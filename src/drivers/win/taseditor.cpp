@@ -211,6 +211,7 @@ void updateTASEditor()
 		taseditorSkipping = 1;
 		greenzone.updateFFWD();
 		playback.updateFFWD();
+		pianoRoll.update();
 	}
 	else if (taseditorWindow.hwndTASEditor)
 	{

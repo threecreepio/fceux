@@ -146,13 +146,7 @@ int FCEU_InitVirtualVideo(void)
 
 void FCEU_PutImageDummy(void)
 {
-	ShowFPS();
-	if(GameInfo->type!=GIT_NSF)
-	{
-		FCEU_DrawNTSCControlBars(XBuf);
-		FCEU_DrawSaveStates(XBuf);
-		FCEU_DrawMovies(XBuf);
-	}
+	UpdateFPS();
 	if(guiMessage.howlong) guiMessage.howlong--; /* DrawMessage() */
 }
 
@@ -731,6 +725,18 @@ void FCEUI_ToggleShowFPS()
 
 static uint64 boop[60];
 static int boopcount = 0;
+
+void UpdateFPS(void)
+{
+	if (Show_FPS == false)
+		return;
+	char fpsmsg[16];
+	int booplimit = PAL ? 50 : 60;
+	boop[boopcount] = FCEUD_GetTime();
+
+	// It's not averaging FPS over exactly 1 second, but it's close enough.
+	boopcount = (boopcount + 1) % booplimit;
+}
 
 void ShowFPS(void)
 {

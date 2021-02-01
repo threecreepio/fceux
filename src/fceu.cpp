@@ -759,7 +759,7 @@ void FCEUI_Emulate(uint8 **pXBuf, int32 **SoundBuf, int32 *SoundBufSize, int ski
 	CallRegisteredLuaFunctions(LUACALL_AFTEREMULATION);
 #endif
 
-	if (skip && !aggressiveskip_disabled) {
+	if (skip && !aggressiveskip_disabled && (!taseditorActive || (taseditorSkipping && currFrameCounter % 0x20 != 0))) {
 		FCEU_PutImageDummy();
 	}
 	else {
