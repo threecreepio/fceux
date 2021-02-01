@@ -35,6 +35,7 @@
 #include "video.h"
 #include "input.h"
 #include "driver.h"
+#include "movie.h"
 #include "debug.h"
 		 
 #include <cstring>

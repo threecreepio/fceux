@@ -57,12 +57,67 @@ void GREENZONE::reset()
 {
 	free();
 }
+void GREENZONE::updateFFWD()
+{
+	// keep collecting savestates, this code must be executed at the end of every frame
+	if (taseditorConfig.enableGreenzoning)
+	{
+		collectCurrentState(0x20);
+	}
+	else
+	{
+		// just update Greenzone upper limit
+		if (greenzoneSize <= currFrameCounter)
+			greenzoneSize = currFrameCounter + 1;
+	}
+
+	// run cleaning from time to time
+	if (clock() > nextCleaningTime)
+		runGreenzoneCleaning();
+
+	// also log lag frames
+	if (currFrameCounter > 0)
+	{
+		// lagFlag indicates that lag was in previous frame
+		int old_lagFlag = lagLog.getLagInfoAtFrame(currFrameCounter - 1);
+		// Auto-adjust Input according to lag
+		if (taseditorConfig.autoAdjustInputAccordingToLag && old_lagFlag != LAGGED_UNKNOWN)
+		{
+			if ((old_lagFlag == LAGGED_YES) && !lagFlag)
+			{
+				// there's no more lag on previous frame - shift Input up 1 or more frames
+				adjustUp();
+			}
+			else if ((old_lagFlag == LAGGED_NO) && lagFlag)
+			{
+				// there's new lag on previous frame - shift Input down 1 frame
+				adjustDown();
+			}
+		}
+		else
+		{
+			if (lagFlag && (old_lagFlag != LAGGED_YES))
+			{
+				lagLog.setLagInfo(currFrameCounter - 1, true);
+				// keep current snapshot laglog in touch
+				history.getCurrentSnapshot().laglog.setLagInfo(currFrameCounter - 1, true);
+			}
+			else if (!lagFlag && old_lagFlag != LAGGED_NO)
+			{
+				lagLog.setLagInfo(currFrameCounter - 1, false);
+				// keep current snapshot laglog in touch
+				history.getCurrentSnapshot().laglog.setLagInfo(currFrameCounter - 1, false);
+			}
+		}
+	}
+}
+
 void GREENZONE::update()
 {
 	// keep collecting savestates, this code must be executed at the end of every frame
 	if (taseditorConfig.enableGreenzoning)
 	{
-		collectCurrentState();
+		collectCurrentState(1);
 	} else
 	{
 		// just update Greenzone upper limit
@@ -108,15 +163,15 @@ void GREENZONE::update()
 	}
 }
 
-void GREENZONE::collectCurrentState()
+void GREENZONE::collectCurrentState(int frequency)
 {
 	if ((int)savestates.size() <= currFrameCounter)
 		savestates.resize(currFrameCounter + 1);
 	// if frame is not saved - log savestate
-	if (!savestates[currFrameCounter].size())
+	if (!savestates[currFrameCounter].size() && (currFrameCounter % frequency) == 0)
 	{
 		EMUFILE_MEMORY ms(&savestates[currFrameCounter]);
-		FCEUSS_SaveMS(&ms, Z_DEFAULT_COMPRESSION);
+		FCEUSS_SaveMS(&ms, frequency > 1 ? Z_NO_COMPRESSION : Z_DEFAULT_COMPRESSION);
 		ms.trim();
 	}
 	if (greenzoneSize <= currFrameCounter)
@@ -234,7 +289,7 @@ void GREENZONE::save(EMUFILE *os, int save_type)
 {
 	if (save_type != GREENZONE_SAVING_MODE_NO)
 	{
-		collectCurrentState();		// in case the project is being saved before the greenzone.update() was called within current frame
+		collectCurrentState(1);		// in case the project is being saved before the greenzone.update() was called within current frame
 		runGreenzoneCleaning();
 		if (greenzoneSize > (int)savestates.size())
 			greenzoneSize = savestates.size();
@@ -335,7 +390,7 @@ void GREENZONE::save(EMUFILE *os, int save_type)
 			if (currFrameCounter > 0)
 			{
 				// write ONE savestate for currFrameCounter
-				collectCurrentState();
+				collectCurrentState(1);
 				int size = savestates[currFrameCounter].size();
 				write32le(size, os);
 				os->fwrite(&savestates[currFrameCounter][0], size);

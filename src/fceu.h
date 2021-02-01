@@ -15,6 +15,8 @@ extern int normalscanlines;
 extern int totalscanlines;
 extern int postrenderscanlines;
 extern int vblankscanlines;
+extern int taseditorActive;
+extern int taseditorSkipping;
 
 extern bool AutoResumePlay;
 extern char romNameWhenClosingEmulator[];

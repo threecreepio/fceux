@@ -106,6 +106,8 @@ int normalscanlines;
 int totalscanlines;
 int postrenderscanlines = 0;
 int vblankscanlines = 0;
+int taseditorActive = 0;
+int taseditorSkipping = 0;
 //------------
 
 int AFon = 1, AFoff = 1, AutoFireOffset = 0; //For keeping track of autofire settings

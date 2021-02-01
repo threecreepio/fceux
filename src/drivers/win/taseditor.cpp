@@ -22,6 +22,7 @@ Main - Main gate between emulator and Taseditor
 #include "main.h"			// for GetRomName
 #include "taseditor.h"
 #include "window.h"
+#include "../../fceu.h"
 #include "../../input.h"
 #include "../keyboard.h"
 #include "../joystick.h"
@@ -74,6 +75,7 @@ extern void TaseditorManualFunction();
 // returns true if Taseditor is engaged at the end of the function
 bool enterTASEditor()
 {
+	taseditorActive = true;
 	if (taseditorWindow.hwndTASEditor)
 	{
 		// TAS Editor is already engaged, just set focus to its window
@@ -170,6 +172,7 @@ bool enterTASEditor()
 bool exitTASEditor()
 {
 	if (!askToSaveProject()) return false;
+	taseditorActive = false;
 
 	// destroy window
 	taseditorWindow.exit();
@@ -204,8 +207,14 @@ bool exitTASEditor()
 // everyframe function
 void updateTASEditor()
 {
-	if (taseditorWindow.hwndTASEditor)
+	if (taseditorWindow.hwndTASEditor && turbo && playback.pauseFrame > currFrameCounter + 1000) {
+		taseditorSkipping = 1;
+		greenzone.updateFFWD();
+		playback.updateFFWD();
+	}
+	else if (taseditorWindow.hwndTASEditor)
 	{
+		taseditorSkipping = 0;
 		// TAS Editor is engaged
 		// update all modules that need to be updated every frame
 		// the order is somewhat important, e.g. Greenzone must update before Bookmark Set, Piano Roll must update before Selection

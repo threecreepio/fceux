@@ -84,8 +84,104 @@ void PLAYBACK::reset()
 	emuPausedOldState = emuPausedState = true;
 	stopSeeking();
 }
-void PLAYBACK::update()
+
+void PLAYBACK::updateFFWD()
 {
+	// update the Playback cursor
+	if (currFrameCounter != lastCursorPos)
+	{
+		// update gfx of the old and new rows
+		pianoRoll.redrawRow(lastCursorPos);
+		bookmarks.redrawChangedBookmarks(lastCursorPos);
+		pianoRoll.redrawRow(currFrameCounter);
+		bookmarks.redrawChangedBookmarks(currFrameCounter);
+		lastCursorPos = currFrameCounter;
+		// follow the Playback cursor, but in case of seeking don't follow it
+		pianoRoll.followPlaybackCursorIfNeeded(false);	//pianoRoll.updatePlaybackCursorPositionInPianoRoll();	// an unfinished experiment
+		// enforce redrawing now
+		UpdateWindow(pianoRoll.hwndList);
+	}
+	// [non-lazy] update "Playback's Marker text" if needed
+	if (mustFindCurrentMarker)
+	{
+		markersManager.updateEditedMarkerNote();
+		displayedMarkerNumber = markersManager.getMarkerAboveFrame(currFrameCounter);
+		redrawMarkerData();
+		mustFindCurrentMarker = false;
+	}
+
+	// pause when seeking hits pause_frame
+	if (pauseFrame && currFrameCounter + 1 >= pauseFrame)
+		stopSeeking();
+	else if (currFrameCounter >= getLastPosition() && currFrameCounter >= currMovieData.getNumRecords() - 1 && mustAutopauseAtTheEnd && taseditorConfig.autopauseAtTheEndOfMovie && !isTaseditorRecording())
+		// pause at the end of the movie
+		pauseEmulation();
+
+	// update flashing pauseframe
+	if (oldPauseFrame != pauseFrame && oldPauseFrame)
+	{
+		// pause_frame was changed, clear old_pauseframe gfx
+		pianoRoll.redrawRow(oldPauseFrame - 1);
+		bookmarks.redrawChangedBookmarks(oldPauseFrame - 1);
+	}
+	oldPauseFrame = pauseFrame;
+	oldStateOfShowPauseFrame = showPauseFrame;
+	if (pauseFrame)
+	{
+		if (emuPausedState)
+			showPauseFrame = (int)(clock() / PAUSEFRAME_BLINKING_PERIOD_WHEN_PAUSED) & 1;
+		else
+			showPauseFrame = (int)(clock() / PAUSEFRAME_BLINKING_PERIOD_WHEN_SEEKING) & 1;
+	}
+	else showPauseFrame = false;
+	if (oldStateOfShowPauseFrame != showPauseFrame)
+	{
+		// update pauseframe gfx
+		pianoRoll.redrawRow(pauseFrame - 1);
+		bookmarks.redrawChangedBookmarks(pauseFrame - 1);
+	}
+
+	// update seeking progressbar
+	emuPausedOldState = emuPausedState;
+	emuPausedState = (FCEUI_EmulationPaused() != 0);
+	if (pauseFrame)
+	{
+		if (oldStateOfShowPauseFrame != showPauseFrame)		// update progressbar from time to time
+			// display seeking progress
+			setProgressbar(currFrameCounter - seekingBeginningFrame, pauseFrame - seekingBeginningFrame);
+	}
+	else if (emuPausedOldState != emuPausedState)
+	{
+		// emulator got paused/unpaused externally
+		if (emuPausedOldState && !emuPausedState)
+		{
+			// externally unpaused - show empty progressbar
+			setProgressbar(0, 1);
+		}
+		else
+		{
+			// externally paused - progressbar should be full
+			setProgressbar(1, 1);
+		}
+	}
+
+	// prepare to stop at the end of the movie in case user unpauses emulator
+	if (emuPausedState)
+	{
+		if (currFrameCounter < currMovieData.getNumRecords() - 1)
+			mustAutopauseAtTheEnd = true;
+		else
+			mustAutopauseAtTheEnd = false;
+	}
+
+	// this little statement is very important for adequate work of the "green arrow" and "Restore last position"
+	if (!emuPausedState)
+		// when emulating, lost_position_frame becomes unstable (which means that it's probably not equal to the end of current segment anymore)
+		lastPositionIsStable = false;
+}
+
+void PLAYBACK::update()
+	{
 	// controls:
 	// update < and > buttons
 	rewindButtonOldState = rewindButtonState;

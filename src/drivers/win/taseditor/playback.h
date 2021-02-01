@@ -11,9 +11,11 @@
 class PLAYBACK
 {
 public:
+	int pauseFrame;
 	PLAYBACK();
 	void init();
 	void reset();
+	void updateFFWD();
 	void update();
 
 	void ensurePlaybackIsInsideGreenzone(bool executeLua = true);
@@ -58,7 +60,6 @@ public:
 private:
 	bool setPlaybackAboveOrToFrame(int frame, bool forceStateReload = false);
 
-	int pauseFrame;
 	int lastPositionFrame;
 	bool lastPositionIsStable;	// for when Greenzone invalidates several times, but the end of current segment must remain the same
 

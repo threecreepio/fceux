@@ -20,6 +20,7 @@ public:
 	void init();
 	void reset();
 	void free();
+	void updateFFWD();
 	void update();
 
 	void save(EMUFILE *os, int save_type = GREENZONE_SAVING_MODE_ALL);
@@ -45,7 +46,7 @@ public:
 	LAGLOG lagLog;
 
 private:
-	void collectCurrentState();
+	void collectCurrentState(int freq);
 	bool clearSavestateOfFrame(unsigned int frame);
 	bool clearSavestateAndFreeMemory(unsigned int frame);
 
