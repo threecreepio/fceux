@@ -18,6 +18,7 @@ extern int postrenderscanlines;
 extern int vblankscanlines;
 extern int taseditorActive;
 extern int taseditorSkipping;
+extern bool hasUsedHookedRegions;
 
 extern bool AutoResumePlay;
 extern char romNameWhenClosingEmulator[];

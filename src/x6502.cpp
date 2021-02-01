@@ -55,7 +55,8 @@ static INLINE void WrMem(unsigned int A, uint8 V)
 {
 	BWrite[A](A,V);
 	#ifdef _S9XLUA_H
-	CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
+    if (hasUsedHookedRegions)
+	    CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
 	#endif
 }
 
@@ -70,7 +71,8 @@ static INLINE void WrRAM(unsigned int A, uint8 V)
 {
 	RAM[A]=V;
 	#ifdef _S9XLUA_H
-	CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
+    if (hasUsedHookedRegions)
+	    CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
 	#endif
 }
 
@@ -85,7 +87,8 @@ void X6502_DMW(uint32 A, uint8 V)
  ADDCYC(1);
  BWrite[A](A,V);
  #ifdef _S9XLUA_H
- CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
+ if (hasUsedHookedRegions)
+    CallRegisteredLuaMemHook(A, 1, V, LUAMEMHOOK_WRITE);
  #endif
 }
 
@@ -424,7 +427,6 @@ void X6502_Run(int32 cycles)
    cycles*=16;    // 16*4=64
 
   _count+=cycles;
-extern int test; test++;
   while(_count>0)
   {
    int32 temp;
@@ -502,7 +504,8 @@ extern int test; test++;
    if (!overclocking)
     FCEU_SoundCPUHook(temp);
    #ifdef _S9XLUA_H
-   CallRegisteredLuaMemHook(_PC, 1, 0, LUAMEMHOOK_EXEC);
+   if (hasUsedHookedRegions)
+    CallRegisteredLuaMemHook(_PC, 1, 0, LUAMEMHOOK_EXEC);
    #endif
    _PC++;
    switch(b1)

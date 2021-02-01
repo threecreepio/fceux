@@ -2161,6 +2161,7 @@ struct TieredRegion
 	}
 };
 TieredRegion hookedRegions [LUAMEMHOOK_COUNT];
+bool hasUsedHookedRegions;
 
 
 static void CalculateMemHookRegions(LuaMemHookType hookType)
@@ -2194,6 +2195,9 @@ static void CalculateMemHookRegions(LuaMemHookType hookType)
 //		++iter;
 //	}
 	hookedRegions[hookType].Calculate(hookedBytes);
+	if (hookedRegions[hookType].NotEmpty()) {
+		hasUsedHookedRegions = true;
+	}
 }
 
 static void CallRegisteredLuaMemHook_LuaMatch(unsigned int address, int size, unsigned int value, LuaMemHookType hookType)
