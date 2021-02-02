@@ -34,6 +34,7 @@ extern PIANO_ROLL pianoRoll;
 extern SELECTION selection;
 
 extern char lagFlag;
+extern bool turbo;
 
 char greenzone_save_id[GREENZONE_ID_LEN] = "GREENZONE";
 char greenzone_skipsave_id[GREENZONE_ID_LEN] = "GREENZONX";
@@ -59,8 +60,11 @@ void GREENZONE::reset()
 }
 void GREENZONE::update()
 {
+	// if we're skipping a lot of frames with turbo active, we don't need to create as many savestates
+	bool seeking = turbo && playback.getPauseFrame() > currFrameCounter + 0x100;
+
 	// keep collecting savestates, this code must be executed at the end of every frame
-	if (taseditorConfig.enableGreenzoning)
+	if (taseditorConfig.enableGreenzoning && (!seeking || currFrameCounter % 0x10 == 0))
 	{
 		collectCurrentState();
 	} else
